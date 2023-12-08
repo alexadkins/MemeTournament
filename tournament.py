@@ -1,6 +1,8 @@
 import pygame
-import sys, os
+import sys, os, shutil
 from bracket import Bracket
+
+section = "001/"
 
 # Initialize Pygame
 pygame.init()
@@ -29,13 +31,15 @@ n_competitions = len(images)//2
 battle_screen = False
 selected_image = "left"
 chosen_image = None
+chosen_file = None
 
 Bracket.initialize_brackets(n_competitions, SCREEN_WIDTH, SCREEN_HEIGHT)
-Bracket.set_bracket_memes(images)
+Bracket.set_bracket_memes(images, filenames)
 
 # Bracket.brackets[50].set_memes(images[0], images[2])
 for bracket in Bracket.brackets:
     bracket.set_memes(images[0], images[1])
+    bracket.set_filenames(filenames[0], filenames[1])
 
 prev_bracket = -1
 selected_bracket = 0
@@ -55,21 +59,38 @@ def resize_image(pygame_image):
 
     return new_width, new_height
 
+def output_last_filenames():
+    print("Final 4:")
+    for i in range(len(Bracket.brackets)-1, len(Bracket.brackets) - 3, -1):
+        # print(i)
+        print(Bracket.brackets[i].meme1_fn)
+        print(Bracket.brackets[i].meme2_fn)
+        shutil.copyfile(Bracket.brackets[i].meme1_fn, section + Bracket.brackets[i].meme1_fn)
+        shutil.copyfile(Bracket.brackets[i].meme2_fn, section + Bracket.brackets[i].meme2_fn)
+
+
 # Main game loop
 while True:
     # try:
     surface.fill(WHITE)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print("What")
+            output_last_filenames()
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 if battle_screen: 
-                    if selected_bracket % 2 == 0:
-                        current_bracket.next_bracket.meme1 = chosen_image
-                    else:
-                        current_bracket.next_bracket.meme2 = chosen_image
+                    try:
+                        if selected_bracket % 2 == 0:
+                            current_bracket.next_bracket.meme1 = chosen_image
+                            current_bracket.next_bracket.meme1_fn = chosen_file
+                        else:
+                            current_bracket.next_bracket.meme2 = chosen_image
+                            current_bracket.next_bracket.meme2_fn = chosen_file
+                    except:
+                        pass
 
                     # Switch to tournament screen
                     battle_screen = False
@@ -102,6 +123,8 @@ while True:
         if current_bracket.meme1 != None and current_bracket.meme2 != None:
             meme1 = pygame.transform.scale(current_bracket.meme1, resize_image(current_bracket.meme1))
             meme2 = pygame.transform.scale(current_bracket.meme2, resize_image(current_bracket.meme2))
+            meme1_fn = current_bracket.meme1_fn
+            meme2_fn = current_bracket.meme2_fn
 
             left_image_rect = meme1.get_rect()
             left_image_rect.topleft = (0, 0)
@@ -115,17 +138,17 @@ while True:
             if selected_image == "left":
                 pygame.draw.rect(surface, SELECT, left_image_rect, 10)
                 chosen_image = meme1
+                chosen_file = meme1_fn
             elif selected_image == "right":
                 pygame.draw.rect(surface, SELECT, right_image_rect, 10)
                 chosen_image = meme2
+                chosen_file = meme2_fn
     
     elif not battle_screen:
         Bracket.draw_brackets(surface)
     
     pygame.display.flip()
     # except:
-    #     for i in range(len(Bracket.brackets), len(Bracket.brackets) - 2):
-    #         print(Bracket.brackets[i].meme1)
-    #         print(Bracket.brackets[i].meme2)
+    #     output_last_filenames()
 
 print("what")

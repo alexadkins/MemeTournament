@@ -76,10 +76,12 @@ class Bracket():
         Bracket.create_brackets(n_competitors, total_brackets, screen_height)
         Bracket.set_next_brackets(rounds)
 
-    def set_bracket_memes(memes):
+    def set_bracket_memes(memes, filenames):
         i = 0
         for meme_i in range(0, len(memes), 2):
             Bracket.brackets[meme_i//2].set_memes(memes[meme_i], memes[meme_i + 1])
+            Bracket.brackets[meme_i//2].set_filenames(filenames[meme_i], filenames[meme_i + 1])
+
         
     def draw_brackets(surface):
         for bracket in Bracket.brackets:
@@ -96,6 +98,8 @@ class Bracket():
     def __init__(self, x, y, width, height, upways):
         self.meme1 = None
         self.meme2 = None
+        self.meme1_fn = None
+        self.meme2_fn = None
 
         self.selected = False
 
@@ -118,6 +122,11 @@ class Bracket():
     def set_memes(self, meme1, meme2):
         self.meme1 = meme1
         self.meme2 = meme2
+
+    def set_filenames(self, fn1, fn2):
+        self.meme1_fn = fn1
+        self.meme2_fn = fn1
+
 
     def draw(self, surface):
         if self.upways:
