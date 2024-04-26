@@ -2,7 +2,7 @@ import pygame
 import sys, os, shutil
 from bracket import Bracket
 
-winners = "1070_001_winners"
+winners = "1070_002_winners"
 # winners = "1050_winners"
 images_dir = "1070_images"
 # images_dir = "1050_images"
@@ -11,8 +11,8 @@ images_dir = "1070_images"
 pygame.init()
 
 # Set up display
-SCREEN_WIDTH = 1400 - 100
-SCREEN_HEIGHT = 900 - 100
+SCREEN_WIDTH = 1400
+SCREEN_HEIGHT = 850
 screen_size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 surface = pygame.display.set_mode(screen_size)
 pygame.display.set_caption("Meme Tournament")
@@ -64,6 +64,10 @@ def resize_image(pygame_image):
     # Calculate the new height based on the desired width and aspect ratio
     new_width = SCREEN_WIDTH // 2
     new_height = int(new_width / aspect_ratio)
+
+    if new_height > SCREEN_HEIGHT:
+        new_height = SCREEN_HEIGHT
+        new_width = int(aspect_ratio * new_height)
 
     return new_width, new_height
 
