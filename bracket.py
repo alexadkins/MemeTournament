@@ -34,8 +34,9 @@ class Bracket():
         upways = True
 
         bracket_tracker = 0  #keeps track of how many brackets seen in round so far
-        half_bracket_tracker = 0  #keeps track of brackets, resets every half
-        num_brackets_per_round_summed = n_competitors  #increases each round by new round num of competitors
+        half_bracket_tracker = 0  
+        #increases each round by new round num of competitors
+        num_brackets_per_round_summed = n_competitors  
         round_competitors = n_competitors  #decreases each round to match round's num of competitors
         round_tracker = 0   #keeps track of which round we're on, starts at 0
         width = Bracket.width
@@ -63,6 +64,7 @@ class Bracket():
             bracket_tracker += 1
             half_bracket_tracker += 1
 
+
     def set_next_brackets(rounds):
         for round_i in range(1, rounds - 1):
             for bracket_i in range(len(Bracket.round_brackets[round_i])):
@@ -81,8 +83,6 @@ class Bracket():
         for meme_i in range(0, len(memes), 2):
             Bracket.brackets[meme_i//2].set_memes(memes[meme_i], memes[meme_i + 1])
             Bracket.brackets[meme_i//2].set_filenames(filenames[meme_i], filenames[meme_i + 1])
-
-        
     def draw_brackets(surface):
         for bracket in Bracket.brackets:
             bracket.draw(surface)
@@ -128,6 +128,16 @@ class Bracket():
         self.meme2_fn = fn2
 
 
+    def fit_image(img, target_w, target_h):
+        orig_w, orig_h = img.get_width(), img.get_height()
+        aspect = orig_w / orig_h
+        new_w = target_w
+        new_h = int(new_w / aspect)
+        if new_h > target_h:
+            new_h = target_h
+            new_w = int(aspect * new_h)
+        return pygame.transform.scale(img, (new_w, new_h))
+
     def draw(self, surface):
         if self.upways:
             line1 = [self.x + self.w * .25, self.y, self.x + self.w * .25, self.y + self.h * .5]
@@ -152,14 +162,19 @@ class Bracket():
         pygame.draw.line(surface, BLACK, [line4[0], line4[1]], [line4[2], line4[3]], self.weight)
 
         if self.meme1 != None:
-            meme1 = self.meme1
-            meme1 = pygame.transform.scale(meme1, (self.w/2, self.h))
-            surface.blit(meme1, self.meme1_pos)
+            meme1 = Bracket.fit_image(self.meme1, self.w//2, self.h)
+            x = self.x + self.w//2 - meme1.get_width()
+            y = self.meme1_pos[1]
+            if not self.upways:
+                y = self.y + self.h - meme1.get_height()
+            surface.blit(meme1, (x, y))
 
         if self.meme2 != None:
-            meme2 = self.meme2
-            meme2 = pygame.transform.scale(meme2, (self.w/2, self.h))
-            surface.blit(meme2, self.meme2_pos)
+            meme2 = Bracket.fit_image(self.meme2, self.w//2, self.h)
+            x, y = self.meme2_pos
+            if not self.upways:
+                y = self.y + self.h - meme2.get_height()
+            surface.blit(meme2, (x, y))
 
         if self.selected:
             pygame.draw.rect(surface, SELECT, self.rect, Bracket.weight)
