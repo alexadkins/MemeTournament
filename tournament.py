@@ -2,19 +2,14 @@ import pygame
 import sys, os, shutil
 from bracket import Bracket
 
-winners = "1070_002_winners"
-# winners = "1050_winners"
-images_dir = "1070_images"
-# images_dir = "1050_images"
+from settings import *
+
 
 # Initialize Pygame
 pygame.init()
-
-# Set up display
-SCREEN_WIDTH = 1400
-SCREEN_HEIGHT = 850
-screen_size = (SCREEN_WIDTH, SCREEN_HEIGHT)
-surface = pygame.display.set_mode(screen_size)
+surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+SCREEN_WIDTH = surface.get_width()
+SCREEN_HEIGHT = surface.get_height()
 pygame.display.set_caption("Meme Tournament")
 
 # Set the font and font size
@@ -79,8 +74,8 @@ def output_last_filenames():
         print(Bracket.brackets[i].meme2_fn)
         print(Bracket.brackets[i].meme1_fn.split("/")[-1])
         print(Bracket.brackets[i].meme2_fn.split("/")[-1])
-        shutil.copyfile(Bracket.brackets[i].meme1_fn, winners + "/" + Bracket.brackets[i].meme1_fn.split("/")[-1])
-        shutil.copyfile(Bracket.brackets[i].meme2_fn, winners + "/" + Bracket.brackets[i].meme2_fn.split("/")[-1])
+        shutil.copyfile(Bracket.brackets[i].meme1_fn, winners_dir + "/" + Bracket.brackets[i].meme1_fn.split("/")[-1])
+        shutil.copyfile(Bracket.brackets[i].meme2_fn, winners_dir + "/" + Bracket.brackets[i].meme2_fn.split("/")[-1])
 
 
 # Main game loop
