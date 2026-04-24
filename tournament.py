@@ -1,5 +1,5 @@
 import pygame
-import sys, os, shutil
+import sys, os, shutil, math, random
 from bracket import Bracket
 
 from settings import *
@@ -26,11 +26,21 @@ filenames = next(os.walk("./" + images_dir), (None, None, []))[2]
 if ".DS_Store" in filenames:
     filenames.remove(".DS_Store")
 filenames = ["./" + images_dir + "/" + fn for fn in filenames]
+for path in filenames:
+    print(path)
+    pygame.image.load(path)
 images = [pygame.image.load(path) for path in filenames]
 
 n_competitors = len(images)
-n_competitions = len(images)//2
-# n_competitors = 16
+n_slots = 2 ** math.ceil(math.log2(n_competitors)) if n_competitors > 1 else 2
+n_byes = n_slots - n_competitors
+images += [None] * n_byes
+filenames += [None] * n_byes
+n_competitions = n_slots // 2
+paired = list(zip(images, filenames))
+random.shuffle(paired)
+images, filenames = map(list, zip(*paired))
+print(f"{n_competitors} competitors, {n_byes} byes, {n_competitions} first-round brackets")
 battle_screen = False
 selected_image = "left"
 chosen_image = None
@@ -39,10 +49,22 @@ chosen_file = None
 Bracket.initialize_brackets(n_competitions, SCREEN_WIDTH, SCREEN_HEIGHT)
 Bracket.set_bracket_memes(images, filenames)
 
-# Bracket.brackets[50].set_memes(images[0], images[2])
-# for bracket in Bracket.brackets:
-#     bracket.set_memes(images[0], images[1])
-#     bracket.set_filenames(filenames[0], filenames[1])
+for i, bracket in enumerate(Bracket.round_brackets[1]):
+    if bracket.meme1 is None and bracket.meme2 is not None:
+        winner, winner_fn = bracket.meme2, bracket.meme2_fn
+    elif bracket.meme2 is None and bracket.meme1 is not None:
+        winner, winner_fn = bracket.meme1, bracket.meme1_fn
+    else:
+        continue
+    try:
+        if i % 2 == 0:
+            bracket.next_bracket.meme1 = winner
+            bracket.next_bracket.meme1_fn = winner_fn
+        else:
+            bracket.next_bracket.meme2 = winner
+            bracket.next_bracket.meme2_fn = winner_fn
+    except AttributeError:
+        pass
 
 prev_bracket = -1
 selected_bracket = 0
@@ -103,8 +125,8 @@ while True:
                     # Switch to tournament screen
                     battle_screen = False
                 else:
-                    # Switch to battle screen 
-                    battle_screen = True
+                    if current_bracket.meme1 is not None and current_bracket.meme2 is not None:
+                        battle_screen = True
 
             if battle_screen:
                 if event.key == pygame.K_LEFT:
