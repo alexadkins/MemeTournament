@@ -101,21 +101,31 @@ def resize_image(pygame_image):
 
     return new_width, new_height
 
-def save_winner(fn):
-    base = fn.split("/")[-1]
-    shutil.copyfile(fn, winners_dir + "/WINNER_" + base)
-    print(f"Winner: {base}")
+def save_top_four(final_bracket, winner_fn):
+    second_fn = final_bracket.meme2_fn if winner_fn == final_bracket.meme1_fn else final_bracket.meme1_fn
+    final_fns = {final_bracket.meme1_fn, final_bracket.meme2_fn}
+    third_fns = [
+        fn for b in Bracket.brackets
+        if hasattr(b, 'next_bracket') and b.next_bracket is final_bracket
+        for fn in (b.meme1_fn, b.meme2_fn)
+        if fn and fn not in final_fns
+    ]
+    places = [('WINNER', winner_fn), ('SECOND', second_fn)] + [
+        (place, fn) for place, fn in zip(('THIRD', 'FOURTH'), third_fns)
+    ]
+    for prefix, fn in places:
+        if fn:
+            base = fn.split("/")[-1]
+            shutil.copyfile(fn, f"{winners_dir}/{prefix}_{base}")
+            print(f"{prefix}: {base}")
 
 def output_last_filenames():
     print("Final 4:")
     for i in range(len(Bracket.brackets)-1, len(Bracket.brackets) - 3, -1):
-        # print(i)
-        print(Bracket.brackets[i].meme1_fn)
-        print(Bracket.brackets[i].meme2_fn)
-        print(Bracket.brackets[i].meme1_fn.split("/")[-1])
-        print(Bracket.brackets[i].meme2_fn.split("/")[-1])
-        shutil.copyfile(Bracket.brackets[i].meme1_fn, winners_dir + "/" + Bracket.brackets[i].meme1_fn.split("/")[-1])
-        shutil.copyfile(Bracket.brackets[i].meme2_fn, winners_dir + "/" + Bracket.brackets[i].meme2_fn.split("/")[-1])
+        for fn in (Bracket.brackets[i].meme1_fn, Bracket.brackets[i].meme2_fn):
+            if fn:
+                print(fn)
+                shutil.copyfile(fn, winners_dir + "/" + fn.split("/")[-1])
 
 
 # Main game loop
@@ -140,7 +150,7 @@ while True:
                     except AttributeError:
                         tournament_winner = chosen_image
                         tournament_winner_fn = chosen_file
-                        save_winner(chosen_file)
+                        save_top_four(current_bracket, chosen_file)
 
                     # Switch to tournament screen
                     battle_screen = False
@@ -189,11 +199,9 @@ while True:
                             current_bracket = Bracket.current_bracket
 
                 if event.key in (pygame.K_LEFT, pygame.K_RIGHT):
-                    try:
-                        Bracket.update_current_bracket(prev_bracket, selected_bracket)
-                        current_bracket = Bracket.current_bracket
-                    except:
-                        output_last_filenames()
+                    selected_bracket = max(0, min(selected_bracket, len(Bracket.brackets) - 1))
+                    Bracket.update_current_bracket(prev_bracket, selected_bracket)
+                    current_bracket = Bracket.current_bracket
 
     if battle_screen:
         # Draw battle screen
@@ -244,14 +252,26 @@ while True:
     elif not battle_screen:
         Bracket.draw_brackets(surface)
         if tournament_winner is not None:
+            overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 200))
+            surface.blit(overlay, (0, 0))
+
+            heading = winner_font.render("WINNER!", True, SELECT)
+            heading_rect = heading.get_rect(center=(SCREEN_WIDTH // 2, 70))
+            surface.blit(heading, heading_rect)
+
+            margin = heading_rect.bottom + 20
+            max_h = SCREEN_HEIGHT - margin - 60
             orig_w, orig_h = tournament_winner.get_width(), tournament_winner.get_height()
             aspect = orig_w / orig_h
-            w = min(SCREEN_WIDTH, int(SCREEN_HEIGHT * aspect))
-            h = min(SCREEN_HEIGHT, int(SCREEN_WIDTH / aspect))
+            w = min(SCREEN_WIDTH, int(max_h * aspect))
+            h = min(max_h, int(SCREEN_WIDTH / aspect))
             winner_scaled = pygame.transform.scale(tournament_winner, (w, h))
-            winner_rect = winner_scaled.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            winner_rect = winner_scaled.get_rect(center=(SCREEN_WIDTH // 2, margin + h // 2))
             surface.blit(winner_scaled, winner_rect)
-            label = winner_font.render("WINNER!", True, SELECT)
-            surface.blit(label, label.get_rect(center=(SCREEN_WIDTH // 2, 60)))
+
+            winner_name = tournament_winner_fn.split(images_dir + '/')[1].split('_')[0].title()
+            name_surf = font.render(winner_name, True, TEXT)
+            surface.blit(name_surf, name_surf.get_rect(center=(SCREEN_WIDTH // 2, winner_rect.bottom + 25)))
     
     pygame.display.flip()
