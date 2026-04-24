@@ -96,19 +96,9 @@ def resize_image(pygame_image):
 
     return new_width, new_height
 
-def save_top_four(final_bracket, winner_fn):
+def save_top_two(final_bracket, winner_fn):
     second_fn = final_bracket.meme2_fn if winner_fn == final_bracket.meme1_fn else final_bracket.meme1_fn
-    final_fns = {final_bracket.meme1_fn, final_bracket.meme2_fn}
-    third_fns = [
-        fn for b in Bracket.brackets
-        if hasattr(b, 'next_bracket') and b.next_bracket is final_bracket
-        for fn in (b.meme1_fn, b.meme2_fn)
-        if fn and fn not in final_fns
-    ]
-    places = [('WINNER', winner_fn), ('SECOND', second_fn)] + [
-        (place, fn) for place, fn in zip(('THIRD', 'FOURTH'), third_fns)
-    ]
-    for prefix, fn in places:
+    for prefix, fn in [('WINNER', winner_fn), ('RUNNERUP', second_fn)]:
         if fn:
             base = fn.split("/")[-1]
             shutil.copyfile(fn, f"{winners_dir}/{prefix}_{base}")
@@ -145,7 +135,7 @@ while True:
                     except AttributeError:
                         tournament_winner = chosen_image
                         tournament_winner_fn = chosen_file
-                        save_top_four(current_bracket, chosen_file)
+                        save_top_two(current_bracket, chosen_file)
 
                     # Switch to tournament screen
                     battle_screen = False
