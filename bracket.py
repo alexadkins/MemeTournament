@@ -147,17 +147,19 @@ class Bracket():
             center_y = Bracket.screen_height // 2
             center_x = self.x + self.w // 2
             pygame.draw.line(surface, BLACK, [center_x, center_y - self.h // 2], [center_x, center_y + self.h // 2], self.weight)
-            top, bottom = center_y, center_y
+            image_rects = []
             if self.meme1 is not None:
                 meme1 = Bracket.fit_image(self.meme1, self.w//2, self.h)
-                surface.blit(meme1, (center_x - meme1.get_width()//2, center_y - meme1.get_height()))
-                top = center_y - meme1.get_height()
+                x, y = center_x - meme1.get_width()//2, center_y - meme1.get_height()
+                surface.blit(meme1, (x, y))
+                image_rects.append(pygame.Rect(x, y, meme1.get_width(), meme1.get_height()))
             if self.meme2 is not None:
                 meme2 = Bracket.fit_image(self.meme2, self.w//2, self.h)
-                surface.blit(meme2, (center_x - meme2.get_width()//2, center_y))
-                bottom = center_y + meme2.get_height()
-            if self.selected:
-                pygame.draw.rect(surface, SELECT, pygame.Rect(self.x, top, self.w, bottom - top), Bracket.weight)
+                x, y = center_x - meme2.get_width()//2, center_y
+                surface.blit(meme2, (x, y))
+                image_rects.append(pygame.Rect(x, y, meme2.get_width(), meme2.get_height()))
+            if self.selected and image_rects:
+                pygame.draw.rect(surface, SELECT, image_rects[0].unionall(image_rects), Bracket.weight)
             return
 
         if self.upways:
@@ -182,6 +184,7 @@ class Bracket():
         pygame.draw.line(surface, BLACK, [line3[0], line3[1]], [line3[2], line3[3]], self.weight)
         pygame.draw.line(surface, BLACK, [line4[0], line4[1]], [line4[2], line4[3]], self.weight)
 
+        image_rects = []
         if self.meme1 != None:
             meme1 = Bracket.fit_image(self.meme1, self.w//2, self.h)
             x = self.x + self.w//2 - meme1.get_width()
@@ -189,6 +192,7 @@ class Bracket():
             if not self.upways:
                 y = self.y + self.h - meme1.get_height()
             surface.blit(meme1, (x, y))
+            image_rects.append(pygame.Rect(x, y, meme1.get_width(), meme1.get_height()))
 
         if self.meme2 != None:
             meme2 = Bracket.fit_image(self.meme2, self.w//2, self.h)
@@ -196,8 +200,9 @@ class Bracket():
             if not self.upways:
                 y = self.y + self.h - meme2.get_height()
             surface.blit(meme2, (x, y))
+            image_rects.append(pygame.Rect(x, y, meme2.get_width(), meme2.get_height()))
 
-        if self.selected:
-            pygame.draw.rect(surface, SELECT, self.rect, Bracket.weight)
+        if self.selected and image_rects:
+            pygame.draw.rect(surface, SELECT, image_rects[0].unionall(image_rects), Bracket.weight)
 
     
