@@ -212,10 +212,8 @@ while True:
             meme1_fn = current_bracket.meme1_fn
             meme2_fn = current_bracket.meme2_fn
 
-            left_image_rect = meme1.get_rect()
-            left_image_rect.topleft = (0, 0)
-            right_image_rect = meme2.get_rect()
-            right_image_rect.topleft = (SCREEN_WIDTH // 2, 0)
+            left_image_rect = meme1.get_rect(midleft=(0, SCREEN_HEIGHT // 2))
+            right_image_rect = meme2.get_rect(midleft=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
 
             # Draw images with outlines
             surface.blit(meme1, left_image_rect)
