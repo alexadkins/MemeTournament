@@ -1,6 +1,6 @@
 import pygame
 
-BLACK = (0, 0, 0)
+BLACK = (210, 210, 210)
 SELECT = (0, 235, 235)
 
 class Bracket():

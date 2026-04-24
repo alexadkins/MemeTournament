@@ -19,9 +19,10 @@ font = pygame.font.Font(None, 30)
 winner_font = pygame.font.Font(None, 120)
 
 # Define colors
-WHITE = (255, 255, 255)
+BG = (40, 40, 40)
 BLACK = (0, 0, 0)
 SELECT = (0, 235, 235)
+TEXT = (240, 240, 240)
 
 # Load images
 path = "."
@@ -113,7 +114,7 @@ def output_last_filenames():
 # Main game loop
 while True:
     # try:
-    surface.fill(WHITE)
+    surface.fill(BG)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             output_last_filenames()
@@ -185,8 +186,8 @@ while True:
             meme2_text = meme2_fn.split(images_dir + '/')[1].split('_')[0].title()
 
             # Render the left and right titles
-            left_title_surface = font.render(meme1_text, True, (0, 0, 0))
-            right_title_surface = font.render(meme2_text, True, (0, 0, 0))
+            left_title_surface = font.render(meme1_text, True, TEXT)
+            right_title_surface = font.render(meme2_text, True, TEXT)
 
             # Get the dimensions of the title surfaces
             left_title_width, left_title_height = left_title_surface.get_size()
