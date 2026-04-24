@@ -18,8 +18,9 @@ class Bracket():
 
     def set_default_size(screen_width, screen_height, n_competitors, rounds):
         Bracket.width = int(screen_width/n_competitors*2)
-        # TODO: dynamically set height
         Bracket.height = int(screen_height/rounds/2)
+        Bracket.screen_width = screen_width
+        Bracket.screen_height = screen_height
 
     def get_total_brackets(n_competitors, round=0):
         while n_competitors > 0:
@@ -40,7 +41,7 @@ class Bracket():
         round_competitors = n_competitors  #decreases each round to match round's num of competitors
         round_tracker = 0   #keeps track of which round we're on, starts at 0
         width = Bracket.width
-        for i in range(1, total_brackets):
+        for i in range(1, total_brackets + 1):
             # Start a new round of brackets
             if i > num_brackets_per_round_summed:
                 num_brackets_per_round_summed += round_competitors // 2
@@ -50,7 +51,7 @@ class Bracket():
                 round_tracker += 1
                 y = Bracket.height * round_tracker
                 upways = True
-                width *= 2
+                width = min(width * 2, Bracket.screen_width)
 
             # Reached halfway point of brackets
             if bracket_tracker >= round_competitors // 2 and upways:
@@ -66,7 +67,7 @@ class Bracket():
 
 
     def set_next_brackets(rounds):
-        for round_i in range(1, rounds - 1):
+        for round_i in range(1, rounds):
             for bracket_i in range(len(Bracket.round_brackets[round_i])):
                 current_bracket = Bracket.round_brackets[round_i][bracket_i]
                 next_bracket = Bracket.round_brackets[round_i + 1][bracket_i // 2]
@@ -139,6 +140,26 @@ class Bracket():
         return pygame.transform.scale(img, (new_w, new_h))
 
     def draw(self, surface):
+        if self.meme1 is None and self.meme2 is None and not hasattr(self, 'next_bracket'):
+            return
+
+        if not hasattr(self, 'next_bracket'):
+            center_y = Bracket.screen_height // 2
+            center_x = self.x + self.w // 2
+            pygame.draw.line(surface, BLACK, [center_x, center_y - self.h // 2], [center_x, center_y + self.h // 2], self.weight)
+            top, bottom = center_y, center_y
+            if self.meme1 is not None:
+                meme1 = Bracket.fit_image(self.meme1, self.w//2, self.h)
+                surface.blit(meme1, (center_x - meme1.get_width()//2, center_y - meme1.get_height()))
+                top = center_y - meme1.get_height()
+            if self.meme2 is not None:
+                meme2 = Bracket.fit_image(self.meme2, self.w//2, self.h)
+                surface.blit(meme2, (center_x - meme2.get_width()//2, center_y))
+                bottom = center_y + meme2.get_height()
+            if self.selected:
+                pygame.draw.rect(surface, SELECT, pygame.Rect(self.x, top, self.w, bottom - top), Bracket.weight)
+            return
+
         if self.upways:
             line1 = [self.x + self.w * .25, self.y, self.x + self.w * .25, self.y + self.h * .5]
             line2 = [self.x + self.w * .75, self.y, self.x + self.w * .75, self.y + self.h * .5]
