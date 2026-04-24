@@ -1,7 +1,5 @@
 import pygame
-
-BLACK = (210, 210, 210)
-SELECT = (0, 235, 235)
+from settings import LINE_COLOR, SELECT
 
 class Bracket():
 
@@ -149,7 +147,7 @@ class Bracket():
         if not hasattr(self, 'next_bracket'):
             center_y = Bracket.screen_height // 2
             center_x = self.x + self.w // 2
-            pygame.draw.line(surface, BLACK, [center_x, center_y - self.h // 2], [center_x, center_y + self.h // 2], self.weight)
+            pygame.draw.line(surface, LINE_COLOR, [center_x, center_y - self.h // 2], [center_x, center_y + self.h // 2], self.weight)
             image_rects = []
             if self.meme1 is not None:
                 meme1 = Bracket.fit_image(self.meme1, self.w//2, self.h)
@@ -183,10 +181,10 @@ class Bracket():
             self.meme1_pos = (self.x, self.y)
             self.meme2_pos = (self.x + self.w * .5, self.y)
 
-        pygame.draw.line(surface, BLACK, [line1[0], line1[1]], [line1[2], line1[3]], self.weight)
-        pygame.draw.line(surface, BLACK, [line2[0], line2[1]], [line2[2], line2[3]], self.weight)
-        pygame.draw.line(surface, BLACK, [line3[0], line3[1]], [line3[2], line3[3]], self.weight)
-        pygame.draw.line(surface, BLACK, [line4[0], line4[1]], [line4[2], line4[3]], self.weight)
+        pygame.draw.line(surface, LINE_COLOR, [line1[0], line1[1]], [line1[2], line1[3]], self.weight)
+        pygame.draw.line(surface, LINE_COLOR, [line2[0], line2[1]], [line2[2], line2[3]], self.weight)
+        pygame.draw.line(surface, LINE_COLOR, [line3[0], line3[1]], [line3[2], line3[3]], self.weight)
+        pygame.draw.line(surface, LINE_COLOR, [line4[0], line4[1]], [line4[2], line4[3]], self.weight)
 
         image_rects = []
         if self.meme1 != None:

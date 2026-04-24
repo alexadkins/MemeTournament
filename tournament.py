@@ -18,11 +18,6 @@ pygame.display.set_caption("Meme Tournament")
 font = pygame.font.Font(None, 30)
 winner_font = pygame.font.Font(None, 120)
 
-# Define colors
-BG = (40, 40, 40)
-BLACK = (0, 0, 0)
-SELECT = (0, 235, 235)
-TEXT = (240, 240, 240)
 
 # Load images
 path = "."
