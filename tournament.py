@@ -77,6 +77,13 @@ selected_bracket = 0
 current_bracket = Bracket.brackets[0]
 current_bracket.selected = True
 
+def find_bracket_location(bracket):
+    for round_i, brackets in Bracket.round_brackets.items():
+        for bracket_i, b in enumerate(brackets):
+            if b is bracket:
+                return round_i, bracket_i
+    return None, None
+
 def resize_image(pygame_image):
     original_width = pygame_image.get_width()
     original_height = pygame_image.get_height()
@@ -149,19 +156,44 @@ while True:
 
             elif not battle_screen:
                 if event.key == pygame.K_LEFT:
-                    # Move left in the bracket
                     prev_bracket = selected_bracket
                     selected_bracket -= 1
                 elif event.key == pygame.K_RIGHT:
-                    # Move right in the bracket
                     prev_bracket = selected_bracket
                     selected_bracket += 1
-                
-                try:
-                    Bracket.update_current_bracket(prev_bracket, selected_bracket)
-                    current_bracket = Bracket.current_bracket
-                except:
-                    output_last_filenames()
+                elif event.key in (pygame.K_UP, pygame.K_DOWN):
+                    round_i, bracket_i = find_bracket_location(current_bracket)
+                    if round_i is not None:
+                        is_final = not hasattr(current_bracket, 'next_bracket')
+                        if is_final:
+                            target_round = round_i - 1
+                            target_index = 0 if event.key == pygame.K_UP else 1
+                        elif current_bracket.upways:
+                            if event.key == pygame.K_DOWN:
+                                target_round, target_index = round_i + 1, bracket_i // 2
+                            else:
+                                target_round, target_index = round_i - 1, bracket_i * 2
+                        else:
+                            if event.key == pygame.K_UP:
+                                target_round, target_index = round_i + 1, bracket_i // 2
+                            else:
+                                target_round, target_index = round_i - 1, bracket_i * 2
+                        if target_round in Bracket.round_brackets:
+                            rbs = Bracket.round_brackets[target_round]
+                            target_index = max(0, min(target_index, len(rbs) - 1))
+                            target_bracket = rbs[target_index]
+                            new_index = Bracket.brackets.index(target_bracket)
+                            Bracket.update_current_bracket(selected_bracket, new_index)
+                            prev_bracket = selected_bracket
+                            selected_bracket = new_index
+                            current_bracket = Bracket.current_bracket
+
+                if event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+                    try:
+                        Bracket.update_current_bracket(prev_bracket, selected_bracket)
+                        current_bracket = Bracket.current_bracket
+                    except:
+                        output_last_filenames()
 
     if battle_screen:
         # Draw battle screen

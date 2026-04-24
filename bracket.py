@@ -140,9 +140,6 @@ class Bracket():
         return pygame.transform.scale(img, (new_w, new_h))
 
     def draw(self, surface):
-        if self.meme1 is None and self.meme2 is None and not hasattr(self, 'next_bracket'):
-            return
-
         if not hasattr(self, 'next_bracket'):
             center_y = Bracket.screen_height // 2
             center_x = self.x + self.w // 2
@@ -158,8 +155,9 @@ class Bracket():
                 x, y = center_x - meme2.get_width()//2, center_y
                 surface.blit(meme2, (x, y))
                 image_rects.append(pygame.Rect(x, y, meme2.get_width(), meme2.get_height()))
-            if self.selected and image_rects:
-                pygame.draw.rect(surface, SELECT, image_rects[0].unionall(image_rects), Bracket.weight)
+            if self.selected:
+                rect = image_rects[0].unionall(image_rects) if image_rects else pygame.Rect(self.x, center_y - self.h//2, self.w, self.h)
+                pygame.draw.rect(surface, SELECT, rect, Bracket.weight)
             return
 
         if self.upways:
@@ -202,7 +200,8 @@ class Bracket():
             surface.blit(meme2, (x, y))
             image_rects.append(pygame.Rect(x, y, meme2.get_width(), meme2.get_height()))
 
-        if self.selected and image_rects:
-            pygame.draw.rect(surface, SELECT, image_rects[0].unionall(image_rects), Bracket.weight)
+        if self.selected:
+            rect = image_rects[0].unionall(image_rects) if image_rects else self.rect
+            pygame.draw.rect(surface, SELECT, rect, Bracket.weight)
 
     
