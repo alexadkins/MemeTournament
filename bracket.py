@@ -129,6 +129,12 @@ class Bracket():
         self.meme2_fn = fn2
 
 
+    def draw_selection(surface, rect):
+        highlight = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+        highlight.fill((0, 235, 235, 50))
+        surface.blit(highlight, (rect.x, rect.y))
+        pygame.draw.rect(surface, SELECT, rect, 5)
+
     def fit_image(img, target_w, target_h):
         orig_w, orig_h = img.get_width(), img.get_height()
         aspect = orig_w / orig_h
@@ -157,7 +163,7 @@ class Bracket():
                 image_rects.append(pygame.Rect(x, y, meme2.get_width(), meme2.get_height()))
             if self.selected:
                 rect = image_rects[0].unionall(image_rects) if image_rects else pygame.Rect(self.x, center_y - self.h//2, self.w, self.h)
-                pygame.draw.rect(surface, SELECT, rect, Bracket.weight)
+                Bracket.draw_selection(surface, rect)
             return
 
         if self.upways:
@@ -202,6 +208,6 @@ class Bracket():
 
         if self.selected:
             rect = image_rects[0].unionall(image_rects) if image_rects else self.rect
-            pygame.draw.rect(surface, SELECT, rect, Bracket.weight)
+            Bracket.draw_selection(surface, rect)
 
     
