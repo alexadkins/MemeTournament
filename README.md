@@ -6,8 +6,10 @@ A single-elimination tournament bracket for end-of-semester meme competitions. S
 
 ## Setup
 
+Dependencies are managed with [uv](https://docs.astral.sh/uv/):
+
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ---
@@ -36,7 +38,7 @@ Byes are handled automatically. Any number of submissions works; the bracket rou
 ## Running
 
 ```bash
-python3 tournament.py
+uv run tournament.py
 ```
 
 The app opens fullscreen. Matchups are randomized on every run.
